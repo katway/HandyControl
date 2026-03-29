@@ -18,6 +18,15 @@
                         <sys:String>Category1</sys:String>
                     </x:Array>
                 </hc:PropertyGrid.CategoryOrder>
+                <hc:PropertyGrid.PropertyOrder>
+                    <x:Array Type="{x:Type sys:String}">
+                        <sys:String>Boolean</sys:String>
+                        <sys:String>Integer</sys:String>
+                        <sys:String>Enum</sys:String>
+                        <sys:String>String</sys:String>
+                        <sys:String>ImageSource</sys:String>
+                    </x:Array>
+                </hc:PropertyGrid.PropertyOrder>
             </hc:PropertyGrid>
             <StackPanel hc:TitleElement.TitleWidth="168" Grid.Row="1" Margin="20,16,17,10">
                 <TextBox hc:TitleElement.Title="String" hc:TitleElement.TitlePlacement="Left" Style="{StaticResource TextBoxExtend}" Text="{Binding DemoModel.String,Mode=OneWay}" IsReadOnly="True"/>

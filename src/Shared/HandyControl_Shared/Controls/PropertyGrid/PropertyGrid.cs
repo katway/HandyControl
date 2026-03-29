@@ -132,6 +132,34 @@ public class PropertyGrid : Control
         set => SetValue(CategoryOrderProperty, value);
     }
 
+    public static readonly DependencyProperty PropertyOrderProperty = DependencyProperty.Register(
+        nameof(PropertyOrder), typeof(IEnumerable<string>), typeof(PropertyGrid),
+        new PropertyMetadata(default(IEnumerable<string>), OnPropertyOrderChanged));
+
+    private static void OnPropertyOrderChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var ctl = (PropertyGrid) d;
+        ctl.OnPropertyOrderChanged();
+    }
+
+    protected virtual void OnPropertyOrderChanged()
+    {
+        if (_dataView == null) return;
+
+        UpdatePropertyOrder();
+
+        if (_dataView.GroupDescriptions.OfType<PropertyGroupDescription>().Any(group => group.PropertyName == PropertyItem.CategoryProperty.Name))
+        {
+            SortByCategory(null, null);
+        }
+    }
+
+    public IEnumerable<string> PropertyOrder
+    {
+        get => (IEnumerable<string>) GetValue(PropertyOrderProperty);
+        set => SetValue(PropertyOrderProperty, value);
+    }
+
     public override void OnApplyTemplate()
     {
         if (_searchBar != null)
@@ -161,6 +189,7 @@ public class PropertyGrid : Control
             .Do(item => item.InitElement()));
 
         UpdateCategoryOrder();
+        UpdatePropertyOrder();
 
         SortByCategory(null, null);
         _itemsControl.ItemsSource = _dataView;
@@ -185,6 +214,25 @@ public class PropertyGrid : Control
         }
     }
 
+    private void UpdatePropertyOrder()
+    {
+        if (_dataView?.SourceCollection == null) return;
+
+        var propertyOrderDic = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var index = 0;
+
+        foreach (var propertyName in PropertyOrder ?? Enumerable.Empty<string>())
+        {
+            if (string.IsNullOrWhiteSpace(propertyName) || propertyOrderDic.ContainsKey(propertyName)) continue;
+            propertyOrderDic[propertyName] = index++;
+        }
+
+        foreach (var item in _dataView.SourceCollection.OfType<PropertyItem>())
+        {
+            item.PropertyOrder = propertyOrderDic.TryGetValue(item.PropertyName, out var order) ? order : int.MaxValue;
+        }
+    }
+
     private void SortByCategory(object sender, ExecutedRoutedEventArgs e)
     {
         if (_dataView == null) return;
@@ -195,6 +243,7 @@ public class PropertyGrid : Control
             _dataView.SortDescriptions.Clear();
             _dataView.SortDescriptions.Add(new SortDescription(PropertyItem.CategoryOrderProperty.Name, ListSortDirection.Ascending));
             _dataView.SortDescriptions.Add(new SortDescription(PropertyItem.CategoryProperty.Name, ListSortDirection.Ascending));
+            _dataView.SortDescriptions.Add(new SortDescription(PropertyItem.PropertyOrderProperty.Name, ListSortDirection.Ascending));
             _dataView.SortDescriptions.Add(new SortDescription(PropertyItem.DisplayNameProperty.Name, ListSortDirection.Ascending));
             _dataView.GroupDescriptions.Add(new PropertyGroupDescription(PropertyItem.CategoryProperty.Name));
         }

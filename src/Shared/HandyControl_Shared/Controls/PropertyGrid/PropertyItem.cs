@@ -98,6 +98,15 @@ public class PropertyItem : ListBoxItem
         set => SetValue(CategoryOrderProperty, value);
     }
 
+    public static readonly DependencyProperty PropertyOrderProperty = DependencyProperty.Register(
+        nameof(PropertyOrder), typeof(int), typeof(PropertyItem), new PropertyMetadata(default(int)));
+
+    public int PropertyOrder
+    {
+        get => (int) GetValue(PropertyOrderProperty);
+        set => SetValue(PropertyOrderProperty, value);
+    }
+
     public static readonly DependencyProperty EditorProperty = DependencyProperty.Register(
         nameof(Editor), typeof(PropertyEditorBase), typeof(PropertyItem), new PropertyMetadata(default(PropertyEditorBase)));
 
