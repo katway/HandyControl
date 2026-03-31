@@ -27,6 +27,8 @@ public class PropertyGridDemoModel
 
 public enum Gender
 {
+    [Description("Boy/Man/Male")]
     Male,
+    [Description("Girl/Woman/Female")]
     Female
 }
